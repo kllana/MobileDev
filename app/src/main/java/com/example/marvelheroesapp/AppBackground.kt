@@ -9,24 +9,20 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 
 @Composable
-fun CustomBackground() {
+fun AppBackground() {
     Canvas(modifier = Modifier.fillMaxSize()) {
-        drawRect(
-            color = Color.hsl(300f, 0.05f, 0.16f, 1f),
-            size = size
-        )
+        drawRect(color = Color.hsl(300f, 0.05f, 0.16f, 1f),
+            size = size)
 
-        val path = Path().apply {
-            moveTo(size.width, size.height)
+        val path = Path().apply { moveTo(size.width, size.height)
             lineTo(size.width * 0f, size.height)
             lineTo(size.width, size.height * 0.4f)
-            close()
-        }
+            close() }
 
-        drawPath(
-            path = path,
+        drawPath(path = path,
             color = Color.hsl(359f, 0.76f, 0.34f, 1f),
             style = Fill
         )
     }
 }
+

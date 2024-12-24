@@ -1,4 +1,4 @@
-package com.example.marvelheroesapp.ui.theme
+package com.example.marvelheroesapp
 
 import android.app.Activity
 import android.os.Build
@@ -10,12 +10,12 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.example.homework01.ui.theme.Pink40
-import com.example.homework01.ui.theme.Pink80
-import com.example.homework01.ui.theme.Purple40
-import com.example.homework01.ui.theme.Purple80
-import com.example.homework01.ui.theme.PurpleGrey40
-import com.example.homework01.ui.theme.PurpleGrey80
+import com.example.marvelheroesapp.ui.theme.Pink40
+import com.example.marvelheroesapp.ui.theme.Pink80
+import com.example.marvelheroesapp.ui.theme.Purple40
+import com.example.marvelheroesapp.ui.theme.Purple80
+import com.example.marvelheroesapp.ui.theme.PurpleGrey40
+import com.example.marvelheroesapp.ui.theme.PurpleGrey80
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -27,11 +27,10 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40
-
 )
 
 @Composable
-fun MarvelHeroesAppTheme(
+fun Homework01Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit

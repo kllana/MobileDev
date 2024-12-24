@@ -28,7 +28,14 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+            // Добавляем ключи в buildConfig
+            buildConfigField("String", "MARVEL_PUBLIC_KEY", "\"${property("MARVEL_PUBLIC_KEY")}\"")
+            buildConfigField("String", "MARVEL_PRIVATE_KEY", "\"${property("MARVEL_PRIVATE_KEY")}\"")
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -38,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true // Включаем поддержку BuildConfig
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -50,7 +58,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -72,16 +79,12 @@ dependencies {
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
     implementation(libs.androidx.material.icons.extended)
 
-
+    implementation(libs.moshi.kotlin)
+    implementation(libs.moshi)
+    implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
+    implementation (libs.moshi.kotlin.codegen)
 
 }
