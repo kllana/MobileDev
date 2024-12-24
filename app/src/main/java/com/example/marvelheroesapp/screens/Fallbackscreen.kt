@@ -30,7 +30,7 @@ fun FallbackScreen(
                 .padding(16.dp)
         ) {
             Text(
-                "Нет подключения к сети",
+                "Ошибка загрузки",
                 style = TextStyle(
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
@@ -38,13 +38,25 @@ fun FallbackScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Text(
+                "Данные не найдены",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                ),
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = onRetry,
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier.height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF800000))
+                colors = ButtonDefaults.buttonColors(Color.DarkGray)
             ) {
                 Text(text = "Обновить страницу", color = Color.White, fontSize = 18.sp)
             }

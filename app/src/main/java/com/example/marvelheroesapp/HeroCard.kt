@@ -1,6 +1,5 @@
 package com.example.marvelheroesapp
 
-import com.example.marvelheroesapp.classes.Hero
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,28 +21,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.marvelheroesapp.classes.HeroForRender
 
 
 @Composable
-fun HeroCard(hero: Hero, onClick: () -> Unit) {
-    Box(modifier = Modifier
+fun HeroCard(hero: HeroForRender, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
             .width(350.dp)
             .fillMaxHeight()
             .clickable(onClick = onClick)
     ) {
-        val painter = rememberAsyncImagePainter(model = hero.thumbnail.fullUrl)
+        val painter = rememberAsyncImagePainter(
+            model = hero.thumbnail,
+        )
 
-        Image(painter = painter,
+        Image(
+            painter = painter,
             contentDescription = hero.name,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(0.9f)
-                .clip(RoundedCornerShape(10.dp)))
-        Text(text = hero.name,
-            style = TextStyle(fontSize = 32.sp,
+                .alpha(1f)
+                .clip(RoundedCornerShape(10.dp))
+        )
+
+        Text(
+            text = hero.name,
+            style = TextStyle(
+                fontSize = 32.sp,
                 color = Color.White,
-                fontWeight = FontWeight.Bold,),
+                fontWeight = FontWeight.Bold,
+            ),
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(start = 28.dp, bottom = 60.dp, end = 28.dp)

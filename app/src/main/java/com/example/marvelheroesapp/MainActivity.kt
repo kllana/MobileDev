@@ -1,62 +1,114 @@
 package com.example.marvelheroesapp
 
-import com.example.marvelheroesapp.classes.Hero
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.lifecycleScope
-import com.example.marvelheroesapp.classes.ApiKeys
+import com.example.marvelheroesapp.classes.*
 import kotlinx.coroutines.launch
-import com.example.marvelheroesapp.classes.ApiResponse
+import java.security.MessageDigest
 
 class MainActivity : ComponentActivity() {
 
-    private val heroesState = mutableStateOf<List<Hero>>(emptyList())
+    private val heroesState = mutableStateOf(emptyList<HeroForRender>())
     private val hasError = mutableStateOf(false)
+
+    private lateinit var database: AppDatabase
+    private lateinit var heroBD: HeroDataBase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        loadHeroes()
+
+        database = AppDatabase.getDatabase(this)
+        heroBD = database.heroBD()
+
+        updateHeroes()
 
         setContent {
             MarvelApp(
                 heroes = heroesState.value,
                 hasError = hasError.value,
-                onRetry = ::loadHeroes
+                onRetry = ::updateHeroes
             )
         }
     }
 
-    private fun loadHeroes() {
-        updateState(isError = false)
+    private fun updateHeroes() {
+        hasError.value = false
         lifecycleScope.launch {
-            runCatching {
+            val heroesFromDb = heroBD.getAllHeroes()
+            if (heroesFromDb.isNotEmpty()) {
+                heroesState.value = heroesFromDb.map(::entityHeroToHeroForRender)
+            }
+            fetchHeroesAndUpdateDb()
+        }
+    }
+    fun generateMD5Hash(input: String): String {
+        val md = MessageDigest.getInstance("MD5")
+        val digest = md.digest(input.toByteArray())
+        return digest.joinToString("") { "%02x".format(it) }
+    }
+
+    private suspend fun fetchHeroesAndUpdateDb() {
+        lifecycleScope.launch {
+            try {
                 val timeStamp = System.currentTimeMillis().toString()
-                val hash = generateMD5Hash(
-                    "$timeStamp${ApiKeys.PRIVATE_KEY.key}${ApiKeys.PUBLIC_KEY.key}"
-                )
-                RetrofitInstance.api.getCharacters(
+                val response = RetrofitInstance.api.getCharacters(
                     apiKey = ApiKeys.PUBLIC_KEY.key,
-                    hash = hash,
+                    hash = generateMD5Hash(
+                        timeStamp + ApiKeys.PRIVATE_KEY.key + ApiKeys.PUBLIC_KEY.key
+                    ),
                     ts = timeStamp
                 )
-            }.onSuccess { response: retrofit2.Response<ApiResponse> -> // Указание типа явно
-                if (response.isSuccessful && response.body() != null) {
-                    updateState(heroes = response.body()?.data?.results ?: emptyList())
-                } else {
-                    updateState(isError = true)
+                runCatching {
+                    response
+                }.onSuccess { _: retrofit2.Response<ApiResponse> ->
+                    if (response.isSuccessful && response.body() != null) {
+                        val heroes = response.body()?.data?.results ?: emptyList()
+
+                        val heroEntities = heroes.map { heroToEntityHero(it) }
+                        val uiHeroes = heroes.map { heroToHeroForRender(it) }
+
+                        heroBD.deleteAllHeroes()
+                        heroBD.insertHeroes(heroEntities)
+
+                        if (heroesState.value.isEmpty()) {
+                            heroesState.value = uiHeroes
+                        }
+                    } else {
+                        if (heroesState.value.isEmpty()) {
+                            hasError.value = true
+                        }
+                    }
+                }.onFailure { _: Throwable ->
+                    if (heroesState.value.isEmpty()) {
+                        hasError.value = true
+                    }
                 }
-            }.onFailure { _: Throwable -> // Указание типа ошибки (опционально)
-                updateState(isError = true)
+            } catch (e: Exception) {
+                if (heroesState.value.isEmpty()) {
+                    hasError.value = true
+                }
             }
         }
     }
 
-    private fun updateState(heroes: List<Hero> = heroesState.value, isError: Boolean = hasError.value) {
-        heroesState.value = heroes
-        hasError.value = isError
+
+    private fun saveHeroesToDb(heroes: List<Hero>) {
+        lifecycleScope.launch {
+            val heroEntities = heroes.map(::heroToEntityHero)
+            heroBD.run {
+                deleteAllHeroes()
+                insertHeroes(heroEntities)
+            }
+        }
+    }
+
+    private fun handleFetchError() {
+        if (heroesState.value.isEmpty()) {
+            hasError.value = true
+        }
     }
 }
-
 
